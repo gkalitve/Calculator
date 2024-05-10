@@ -1,4 +1,4 @@
-let [a, op, b, input] = [``, ``, ``, ``]; 
+let [a, op, b, input, result] = [``, ``, ``, ``, ``];   
 
 let upperRow = document.getElementsByClassName("upperRow");
 
@@ -27,6 +27,41 @@ function operate () {
     }
 }
 
+function variable (x, input) { 
+    
+    // if this is the 10th char, then ignore input
+    if (lowerRow[0].textContent.length >= 10) {}
+
+    // otherwise continue
+    else {      
+
+        // if x has decimal places
+        if ((x.toString().includes(`.`))) { 
+
+            // ignore `.` input, otherwise add input                  
+            (input == `.`) ?   x  :  (x += input);
+
+            // apply toFixed method to round up last digit, if the last digit after decimal is not `0`       
+            x.toString().charAt(x.toString().length - 1) == `0` ? x : x = round(x);
+
+        // if first input is `.` make it `0.` 
+        } else if ((x === ``) && (input == `.`)) {x = `0.`} 
+
+        // otherwise keep adding input to x
+        else { x += input }                               
+    }
+
+    // assign x to string lowerRow   
+    lowerRow[0].textContent = x;
+    return x;
+}
+
+// use toFixed method to round up last decimal digit
+function round (decimal) {   
+    decimal = +decimal;
+    return decimal.toFixed((decimal.toString().slice(0, 9).length - (decimal.toString().indexOf(`.`) + 1)));
+}
+
 let btn = document.querySelectorAll("button");
 btn.forEach(function(i) {
     i.addEventListener(`mouseover`, () => i.classList.add("hover"));
@@ -42,83 +77,117 @@ btn.forEach(function(i) {
 
     switch (input) {
 
-    // clear everything
-    case (`AC`):
+        // clear everything
+        case (`AC`):
 
-      [a, b, op, upperRow[0].textContent, lowerRow[0].textContent] = [``,``,``,``,``]
-      break;
-
-    // clear last figure  
-    case (`C`):
-
-        // clearing a
-        if (a != `` && op == ``) {
-            a = a.slice(0, a.length - 1);
-            lowerRow[0].textContent = a;
-            upperRow[0].textContent = ``;
-
-        // clearing op           
-        } else if (b == `` && op != ``) {
-            op = ``;
-            upperRow[0].textContent = a;
-
-        // clearing b
-        } else if (b != ``) {
-            b = b.slice(0, b.length - 1);
-            lowerRow[0].textContent = b;
-        }
-
+        [a, b, op, upperRow[0].textContent, lowerRow[0].textContent] = [``,``,``,``,``]
         break;
 
-    default:
+        // clear last figure  
+        case (`C`):
 
-        // check if key pressed is number or operator
-        let isNum = Array.from(Array(10).keys()).includes(Number(input));  
+            // clearing a
+            if (a !== `` && op == ``) {
+                a = a.toString().slice(0, a.toString().length - 1);
+                (a.toString().includes(`.`) && (a.charAt(a.toString().length - 1) != `.`))
+                ? lowerRow[0].textContent = round(a)
+                : lowerRow[0].textContent = a;
+                // clearing out upperRow equation if a is being modified    
+                upperRow[0].textContent = ``;
 
-        // 0) ERROR message: 
-        //    operator without 1st value 
-        //    `=` sign without second value 
-        //    division by 0
-        if (((a == ``) && (isNum == false)) || ((input == `=`) && (b == ``)) || ((op == `÷`) && (b == `0`))) {
-            upperRow[0].textContent = ``;
-            lowerRow[0].textContent = `ERROR`;
-        } 
+            // clearing op           
+            } else if (b === `` && op !== ``) {
+                op = ``;
+                lowerRow[0].textContent = a;
 
-        // 1) b not declared, op not declared, input is a number => assign to a; allows to have mutli figure a
-        else if ((b == ``) && (op == ``) && (isNum == true)) { 
-            a += input;
-            lowerRow[0].textContent = a;
-            return a;
-        }
+            // clearing b
+            } else if (b !== ``) {
+                b = b.slice(0, b.length - 1);
+                lowerRow[0].textContent = b;
+            }
 
-        // 2) a declared, b not declared, input is an operator => assign to op; allows to change operator
-        else if ((a != ``) && (b == ``) && (isNum == false)) {    
-            op = input;
-            lowerRow[0].textContent = a + op;
-            return op;
-        }
+            break;
 
-        // 3) op declared, b not declared, input is a number => assign to b; necessary to move current line to upperRow;
-        else if ((op != ``) && (b == ``) && (isNum == true)) {
-            b = input;
-            upperRow[0].textContent = lowerRow[0].textContent;
-            lowerRow[0].textContent = b;
-            return b;
-        }
+        default:
 
-        // 4) op declared, b declared, input is a number => assign to b; necessary to keep b on lowerRow;
-        else if ((op != ``) && (b != ``) && (isNum == true)) {
-            b += input;
-            lowerRow[0].textContent = b;
-            return b;
-        }
+            // check if key pressed is number or operator
+            let isNum = Array.from(Array(10).keys()).includes(Number(input)); 
 
-        // 5) b declared, input is "=" => run operate(), a = last result, op and b cleared
-        else if ((b != ``) && (input == `=`)) {
-            upperRow[0].textContent += lowerRow[0].textContent + input;
-            lowerRow[0].textContent = operate(a, op, b);
-            [a, op, b] = [lowerRow[0].textContent,``,``];
-        }
-        
-}})
+            // CASE ERROR
+            // operator without 1st value 
+            // `=` sign without second value 
+            // division by 0
+            if (((a === ``) && (isNum == false) && (input != `.`)) || ((input == `=`) && (b === ``)) || ((op == `÷`) && (b === `0`))) {
+                upperRow[0].textContent = ``;
+                lowerRow[0].textContent = `ERROR`;
+            } 
+
+
+            // CASE a
+            // no result displayed, b not declared, op not declared, input is a number => assign to a; allows to have multi figure a
+            else if ((b === ``) && (op === ``) && (isNum == true || input == `.`)) { 
+            a = variable (a, input);
+            }
+            
+
+            // CASE op
+            // a declared, b not declared, input is an operator => assign to op; allows to change operator
+            else if ((a !== ``) && (b === ``) && (isNum == false) && (input != `.`)) {    
+
+                op = input;
+
+                // converting string a to number, adding op and converting to string loweRow
+                lowerRow[0].textContent = Number(a) + op;
+                return op;
+            }
+
+
+            // CASE b
+            // op declared, b not declared, input is a number => assign to b; necessary to move current line to upperRow;
+            else if ((op !== ``) && (isNum == true || input == `.`)) {
+
+                // check if b is 1st character
+                if (b === ``)  {
+                
+                    // move what's on the lowerRow to upperRow, assign b to lowerRow
+                    upperRow[0].textContent = lowerRow[0].textContent;
+                    lowerRow[0].textContent = b;
+                } 
+                b = variable (b, input);
+            }
+            
+
+            // CASE result
+            else if ((b !== ``)) {
+
+                // converting string b to number to remove trailing "0"
+                b = Number(b);
+
+                // adding b and "=" to upperRow string
+                upperRow[0].textContent += (b + "=");
+
+                // performing the calculation
+                result = (operate(a, op, b));
+
+                    // ERROR if too many digits
+                    if ((result.toString().length >= 10) && !(result.toString().includes(`.`))) {
+                        upperRow[0].textContent = ``;
+                        lowerRow[0].textContent = `ERROR`;
+
+                    } else {
+
+                        // round up if decimal
+                        result.toString().includes(`.`) 
+                        ? result = round(result)
+                        : result;
+
+                        // if input "=" display result as normal and assign result to a;
+                        // if input is "*", "/", "+", or "-", display result, assign result to a, input to op and prepare for input of b for next operation
+                        input == `=`
+                        ? [a, op, b, lowerRow[0].textContent] = [result,``,``, result]
+                        : [a, op, b, lowerRow[0].textContent] = [result, input,``, result + input]
+
+                    }
+            }
+    }})
 })
