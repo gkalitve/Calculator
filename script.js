@@ -72,7 +72,10 @@ btn.forEach(function(i) {
     let input = this.textContent;
 
     // clear display and variables on button press if last input was an ERROR
-    (lowerRow[0].textContent == `ERROR`) ? ([a, b, op, upperRow[0].textContent, lowerRow[0].textContent] = [``,``,``,``,``]) : [a, b, op, upperRow[0].textContent, lowerRow[0].textContent];
+    if (lowerRow[0].textContent == `ERROR`) {
+        ([a, b, op, upperRow[0].textContent, lowerRow[0].textContent] = [``,``,``,``,``])
+
+    } else {
 
     switch (input) {
 
@@ -113,8 +116,7 @@ btn.forEach(function(i) {
             // CASE ERROR
             // operator without 1st value 
             // `=` sign without second value 
-            // division by 0
-            if (((a === ``) && (isNum == false) && (input != `.`)) || ((input == `=`) && (b === ``)) || ((op == `÷`) && (b === `0`))) {
+            if (((a === ``) && (isNum == false) && (input != `.`)) || ((input == `=`) && (b === ``))) {
                 upperRow[0].textContent = ``;
                 lowerRow[0].textContent = `ERROR`;
             } 
@@ -170,9 +172,14 @@ btn.forEach(function(i) {
                     if ((result.toString().length >= 10) && !(result.toString().includes(`.`))) {
                         upperRow[0].textContent = ``;
                         lowerRow[0].textContent = `ERROR`;
+                        
+
+                    // ERROR if result is inifinity
+                    } else if (result == Infinity) {
+                        upperRow[0].textContent = ``;
+                        lowerRow[0].textContent = `ERROR`;
 
                     } else {
-
                         // round up if decimal
                         result.toString().includes(`.`) 
                         ? result = round(result)
@@ -186,5 +193,5 @@ btn.forEach(function(i) {
 
                     }
             }
-    }})
+    }}})
 })
