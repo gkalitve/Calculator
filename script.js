@@ -27,8 +27,8 @@ function operate () {
 
 function variable (x, input) { 
     
-    // if this is the 10th char, then ignore input
-    if (lowerRow[0].textContent.length < 10) {
+    // x is less than 9 chars (allows to extend x up to 9 chars), do the following
+    if (x.length < 9) {
 
         // if x has decimal places, ignore `.` input, otherwise add input   
         if ((x.toString().includes(`.`))) {(input == `.`)?   x   :   (x += input);}
@@ -62,9 +62,9 @@ btn.forEach(function(i) {
 
     let input = this.textContent;
 
-    // clear display and variables on button press if last input was an ERROR
-    if (lowerRow[0].textContent == `ERROR`) {
-        ([a, b, op, upperRow[0].textContent, lowerRow[0].textContent] = [``,``,``,``,``])
+    // clear display and variables on button press if last input was an ERROR message
+    if ((lowerRow[0].textContent == `ERROR`) || (lowerRow[0].textContent == `VALUE`) || (lowerRow[0].textContent == `RESULT`)) {
+        [a, b, op, upperRow[0].textContent, lowerRow[0].textContent, input, result] = [``,``,``,``,``,``,``]
 
     } else {
 
@@ -73,7 +73,7 @@ btn.forEach(function(i) {
         // clear everything
         case (`AC`):
 
-        [a, b, op, upperRow[0].textContent, lowerRow[0].textContent] = [``,``,``,``,``]
+        [a, b, op, upperRow[0].textContent, lowerRow[0].textContent, input, result] = [``,``,``,``,``,``,``]
         break;
 
         // clear last figure  
@@ -104,14 +104,17 @@ btn.forEach(function(i) {
             // check if key pressed is number or operator
             let isNum = Array.from(Array(10).keys()).includes(Number(input)); 
 
-            // CASE ERROR
-            // operator without 1st value 
-            // `=` sign without second value 
-            if (((a === ``) && (isNum == false) && (input != `.`)) || ((input == `=`) && (b === ``))) {
-                upperRow[0].textContent = ``;
-                lowerRow[0].textContent = `ERROR`;
+            // ERROR CASE operator without 1st value 
+            if (((a === ``) && (isNum == false) && (input != `.`))) {
+                upperRow[0].textContent = `ERROR, INPUT FIRST`;
+                lowerRow[0].textContent = `VALUE`;
             } 
 
+            // ERROR CASE `=` sign without second value 
+            if (((input == `=`) && (b === ``))) {
+                upperRow[0].textContent = `ERROR, INPUT SECOND`;
+                lowerRow[0].textContent = `VALUE`;
+            } 
 
             // CASE a
             // no result displayed, b not declared, op not declared, input is a number => assign to a; allows to have multi figure a
@@ -159,19 +162,25 @@ btn.forEach(function(i) {
                 // performing the calculation
                 result = (operate(a, op, b));
 
-                    // ERROR if too many digits
-                    if ((result.toString().length >= 10) && !(result.toString().includes(`.`))) {
-                        upperRow[0].textContent = ``;
-                        lowerRow[0].textContent = `ERROR`;
+                    // `CAN'T FIT` if result is integer and has too many digits
+                    if ((result.toString().length > 9) && !(result.toString().includes(`.`))) {
+                        upperRow[0].textContent = `CANNOT DISPLAY`;
+                        lowerRow[0].textContent = `RESULT`;
+                    }   
                         
+                    // `CAN'T FIT` if result has fractional component and has too many digits
+                    else if ((result.toString().length > 9) && (result.toString().indexOf(`.`)) > 7) {
+                        upperRow[0].textContent = `CANNOT DISPLAY`;
+                        lowerRow[0].textContent = `RESULT`;
+                    }   
 
                     // ERROR if result is inifinity
-                    } else if (result == Infinity) {
+                     else if (result == Infinity) {
                         upperRow[0].textContent = ``;
                         lowerRow[0].textContent = `ERROR`;
+                    }
 
-
-                    } else {
+                     else {
                         // round up if decimal
                         result.toString().includes(`.`) 
                         ? result = round(result)
