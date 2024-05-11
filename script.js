@@ -38,11 +38,9 @@ function variable (x, input) {
         // if x has decimal places
         if ((x.toString().includes(`.`))) { 
 
-            // ignore `.` input, otherwise add input                  
-            (input == `.`) ?   x  :  (x += input);
+         // ignore `.` input, otherwise add input                  
+        (input == `.`) ?   x  :  (x += input);
 
-            // apply toFixed method to round up last digit, if the last digit after decimal is not `0`       
-            x.toString().charAt(x.toString().length - 1) == `0` ? x : x = round(x);
 
         // if first input is `.` make it `0.` 
         } else if ((x === ``) && (input == `.`)) {x = `0.`} 
@@ -56,11 +54,12 @@ function variable (x, input) {
     return x;
 }
 
-// use toFixed method to round up last decimal digit
 function round (decimal) {   
+    // slice off characters beyond 9th and use toFixed method to round up 9th digit
     decimal = +decimal;
-    return decimal.toFixed((decimal.toString().slice(0, 9).length - (decimal.toString().indexOf(`.`) + 1)));
-}
+    decimal = +decimal.toFixed((decimal.toString().slice(0, 9).length - (decimal.toString().indexOf(`.`) + 1)));
+    return decimal;
+}   
 
 let btn = document.querySelectorAll("button");
 btn.forEach(function(i) {
@@ -89,9 +88,7 @@ btn.forEach(function(i) {
             // clearing a
             if (a !== `` && op == ``) {
                 a = a.toString().slice(0, a.toString().length - 1);
-                (a.toString().includes(`.`) && (a.charAt(a.toString().length - 1) != `.`))
-                ? lowerRow[0].textContent = round(a)
-                : lowerRow[0].textContent = a;
+                lowerRow[0].textContent = a;
                 // clearing out upperRow equation if a is being modified    
                 upperRow[0].textContent = ``;
 
