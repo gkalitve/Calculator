@@ -22,28 +22,19 @@ function operate () {
             return (mul(a, b));
         case `÷`:
             return (div(a, b));
-        default:
-            return `ENTER +, -, ×, or ÷`;
     }
 }
 
 function variable (x, input) { 
     
     // if this is the 10th char, then ignore input
-    if (lowerRow[0].textContent.length >= 10) {}
+    if (lowerRow[0].textContent.length < 10) {
 
-    // otherwise continue
-    else {      
-
-        // if x has decimal places
-        if ((x.toString().includes(`.`))) { 
-
-         // ignore `.` input, otherwise add input                  
-        (input == `.`) ?   x  :  (x += input);
-
+        // if x has decimal places, ignore `.` input, otherwise add input   
+        if ((x.toString().includes(`.`))) {(input == `.`)?   x   :   (x += input);}
 
         // if first input is `.` make it `0.` 
-        } else if ((x === ``) && (input == `.`)) {x = `0.`} 
+        else if ((x === ``) && (input == `.`)) {x = `0.`} 
 
         // otherwise keep adding input to x
         else { x += input }                               
@@ -106,7 +97,7 @@ btn.forEach(function(i) {
                 lowerRow[0].textContent = b;
             }
 
-            break;
+        break;
 
         default:
 
@@ -178,6 +169,7 @@ btn.forEach(function(i) {
                     } else if (result == Infinity) {
                         upperRow[0].textContent = ``;
                         lowerRow[0].textContent = `ERROR`;
+
 
                     } else {
                         // round up if decimal
