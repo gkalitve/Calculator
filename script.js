@@ -111,7 +111,7 @@ btn.forEach(function(i) {
             } 
 
             // ERROR CASE `=` sign without second value 
-            if (((input == `=`) && (b === ``))) {
+            if (((a !== ``) && (b === ``) && (input == `=`))) {
                 upperRow[0].textContent = `ERROR, INPUT SECOND`;
                 lowerRow[0].textContent = `VALUE`;
             } 
